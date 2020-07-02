@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>排序可视化</title>
+  <style>
+    #target {
+      border: 1px solid #888;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <button @click="handleSort">冒泡</button>
+  </div>
+  <canvas id="target" width="800" height="300"></canvas>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.0.0-beta.15/vue.global.js"></script>
+  <script src="./helper.js"></script>
+  <script src="./index.js"></script>
+  <script src="./bubble/index.js"></script>
+  <script>
+    const arr = geratorArr(Math.floor(800 / 22));
+    const ctx = new RectPaint(document.querySelector('canvas'), arr)
+
+    ctx.draw();
+
+    const App = Vue.defineComponent({
+      setup() {
+        // 排序开始
+        const handleSort = () => {
+          bubbleSort(arr);
+          console.log(arr)
+          ctx.draw()
+        }
+
+        return { handleSort }
+      }
+    })
+
+    Vue.createApp(App).mount('#app')
+   
+  </script>
+</body>
+</html>
