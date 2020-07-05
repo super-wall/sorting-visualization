@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>排序可视化</title>
   <style>
+    select {
+      margin-right: 6px;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-right: 6px;
+    }
     #target {
       border: 1px solid #888;
     }
@@ -12,31 +19,75 @@
 </head>
 <body>
   <div id="app">
-    <button @click="handleSort">冒泡</button>
+    <p><a href="https://github.com/lhz960904/Blog/issues/6" target="_blank">博客地址</a> </p> 
+    <select v-model="currentSelectSort" @change="handleSortChange">
+      <option :value="item.name"  v-for="item in selectItems" :key="item.name">{{ item.name }}</option>
+    </select>
+    <button @click="handleRandom">生成随机数组</button>
+    <button @click="handleSort">排序</button>
+    动画速度：<input v-model="speed" />
   </div>
-  <canvas id="target" width="800" height="300"></canvas>
+  <canvas id="target" width="800" height="320"></canvas>
   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.0.0-beta.15/vue.global.js"></script>
-  <script src="./helper.js"></script>
+  <!-- 绘图类 -->
   <script src="./index.js"></script>
+  <!-- 冒泡 -->
   <script src="./bubble/index.js"></script>
+  <!-- 选择 -->
+  <script src="./selection/index.js"></script>
+  <!-- 插入 -->
+  <script src="./insertion/index.js"></script>
+  <!-- 归并 -->
+  <script src="./merge/index.js"></script>
+  <!-- 快速 -->
+  <script src="./quick/index.js"></script>
+  <!-- 堆 -->
+  <script src="./heap/index.js"></script>
   <script>
-    const arr = geratorArr(Math.floor(800 / 22));
-    const ctx = new RectPaint(document.querySelector('canvas'), arr)
-
-    ctx.draw();
-
     const App = Vue.defineComponent({
       setup() {
-        // 排序开始
+
+        // 下拉列表
+        const selectItems = [
+          { name: '冒泡排序', sortFn: bubbleSort },
+          { name: '选择排序', sortFn: selectionSort },
+          { name: '插入排序', sortFn: insertionSort },
+          { name: '归并排序', sortFn: mergeSort },
+          { name: '快速排序', sortFn: quickSort },
+          { name: '双路快速排序', sortFn: quickSort2 },
+          { name: '三路快速排序', sortFn: quickSort3 },
+          { name: '堆排序',  sortFn: heapSort },
+        ]
+
+        // 当前选择的排序
+        const currentSelectSort = Vue.ref('冒泡排序');
+
+        // canvas
+        const ctx = new RectPaint();
+
+        // 动画速度
+        const speed = Vue.ref(50);
+
+        // 生成随机数组
+        const handleRandom = () => {
+          ctx.geratorRandomArr()
+        }
+      
+
+        // 进行排序
         const handleSort = () => {
-          bubbleSort(arr);
-          console.log(arr)
-          ctx.draw()
+          const idx = selectItems.findIndex(it => it.name === currentSelectSort.value)
+          ctx.sort(selectItems[idx].sortFn, speed.value)
+        }
+        
+        const handleSortChange = () => {
+          ctx.stopAnimate();
+          ctx.clearCanvas();
         }
 
-        return { handleSort }
+        return { selectItems, currentSelectSort, speed, handleRandom, handleSort, handleSortChange }
       }
-    })
+    });
 
     Vue.createApp(App).mount('#app')
    
